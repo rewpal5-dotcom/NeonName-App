@@ -12,6 +12,7 @@
 - **External links** — `mailto:`, `tel:`, WhatsApp, UPI, ya doosri site ke link phone ke browser/app mein khulte hain
 - **Downloads** — site se koi file download ho to Android ke DownloadManager se Downloads folder mein jaati hai
 - Cookies aur localStorage on — isliye site ka data save rehta hai
+- **Zoom lock** — pinch zoom, double-tap zoom aur left-right panning band; page device width par fix rehta hai (app jaisa feel)
 - Koi ads nahi, koi third-party library nahi, sirf `INTERNET` permission
 
 ## Build

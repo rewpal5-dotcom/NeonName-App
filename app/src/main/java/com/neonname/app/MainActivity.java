@@ -75,11 +75,22 @@ public class MainActivity extends Activity {
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
-        s.setLoadWithOverviewMode(true);
-        s.setUseWideViewPort(true);
+
+        /* ---- zoom lock: page is shown at device width, no pinch/zoom, no left-right panning ---- */
         s.setSupportZoom(false);
+        s.setBuiltInZoomControls(false);
+        s.setDisplayZoomControls(false);
+        s.setTextZoom(100);
+        s.setUseWideViewPort(false);
+        s.setLoadWithOverviewMode(false);
+
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        /* no rubber-band bounce / no horizontal scrollbar */
+        web.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        web.setHorizontalScrollBarEnabled(false);
+        web.setVerticalScrollBarEnabled(true);
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
@@ -97,6 +108,7 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
                 bar.setVisibility(View.GONE);
                 if (errorView != null) errorView.setVisibility(View.GONE);
+                lockLayout(view);
             }
 
             @Override
@@ -159,6 +171,24 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) {
         }
         return true;
+    }
+
+    /**
+     * Locks the page down like a native app: no pinch zoom, no horizontal panning,
+     * nothing sliding left/right under the finger.
+     */
+    private void lockLayout(WebView view) {
+        String js = "(function(){"
+            + "var c='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no';"
+            + "var m=document.querySelector('meta[name=viewport]');"
+            + "if(m){m.setAttribute('content',c);}else{var x=document.createElement('meta');x.setAttribute('name','viewport');x.setAttribute('content',c);(document.head||document.documentElement).appendChild(x);}"
+            + "var st=document.getElementById('__ns_lock');"
+            + "if(!st){st=document.createElement('style');st.id='__ns_lock';"
+            + "st.innerHTML='html,body{overflow-x:hidden !important;max-width:100% !important;touch-action:pan-y !important;}'"
+            + "+'*{touch-action:pan-y;}'"
+            + "(document.head||document.documentElement).appendChild(st);}"
+            + "})();";
+        view.evaluateJavascript(js, null);
     }
 
     private View buildErrorView() {
